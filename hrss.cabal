@@ -1,0 +1,66 @@
+Name:                 hrss
+Version:              0.0.0.1
+License:              BSD3
+License-file:         LICENSE.txt
+Copyright:            Karim DRIDI, 2013
+Author:               Karim DRIDI
+Maintainer:           karim.dridi@gmail.com
+Stability:            Download Manager, Network
+Cabal-version:        >= 1.10
+Build-type:           Simple
+Synopsis:             Simple RSS Reader
+Description:          This tool downloads TV shows on Internet.
+Extra-source-files:   README.txt
+Tested-with:          GHC==7.4.2
+Homepage:             https://github.com/kdridi/hrss
+Category:             Web
+
+executable hrss
+  if impl(ghc >= 7.0.0)
+    default-language: Haskell2010
+
+  build-depends:      base >= 4 && < 5
+  build-depends:      hrss == 0.0.0.1
+
+  hs-source-dirs:     src/main
+  ghc-options:        -O2 -Wall
+
+  main-is:            main.hs
+
+library
+  if impl(ghc >= 7.0.0)
+    default-language: Haskell2010
+
+  build-depends:      base >= 4 && < 5
+  
+  build-depends:      HaXml >= 1.23
+  build-depends:      data-aviary >= 0.2
+
+  hs-source-dirs:     src/lib
+  ghc-options:        -Wall
+
+  exposed-modules:    Web.HRSS
+
+test-suite TestSuite
+  if impl(ghc >= 7.0.0)
+    default-language: Haskell2010
+
+  build-depends:      base >= 4 && < 5
+  build-depends:      hrss == 0.0.0.1
+
+  build-depends:      HaXml >= 1.23
+  build-depends:      data-aviary >= 0.2
+
+  build-depends:      QuickCheck >= 2.5
+  build-depends:      HUnit >= 1.2 && < 2
+  build-depends:      test-framework >= 0.4.1
+  build-depends:      test-framework-quickcheck2
+  build-depends:      test-framework-hunit
+
+  hs-source-dirs:     src/lib, src/lib/Web, src/test
+  ghc-options:        -Wall -rtsopts
+
+  main-is:            main.hs
+
+  type:               exitcode-stdio-1.0
+  x-uses-tf:          true
