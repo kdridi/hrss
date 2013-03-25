@@ -22,7 +22,7 @@ data Outline = Outline
   deriving (Show, Eq)
 
 getOPML :: ArrowXml cat => cat XmlTree OPML
-getOPML = getChildren >>> isElem >>> hasName "opml" >>> parseOpml
+getOPML = atElem "opml" >>> parseOpml
   where
     parseOpml :: ArrowXml cat => cat (NTree XNode) OPML
     parseOpml = proc x -> do
@@ -34,10 +34,7 @@ getOPML = getChildren >>> isElem >>> hasName "opml" >>> parseOpml
     getTitle = atElem "head" >>> atElem "title" >>> getChildren >>> getText
 
     getOutlines :: ArrowXml cat => cat XmlTree [Outline]
-    getOutlines = atElem "body" >>> listA (getChildren >>> getOutline)
-
-    getOutline :: ArrowXml cat => cat XmlTree Outline
-    getOutline = isElem >>> hasName "outline" >>> parseOutline
+    getOutlines = atElem "body" >>> listA ( atElem "outline" >>> parseOutline )
 
     parseOutline :: ArrowXml cat => cat XmlTree Outline
     parseOutline = proc x -> do
