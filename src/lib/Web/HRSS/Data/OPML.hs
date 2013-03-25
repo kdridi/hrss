@@ -24,28 +24,25 @@ data Outline = Outline
 getOPML :: ArrowXml cat => cat XmlTree OPML
 getOPML = atElem "opml" >>> parseOpml
   where
-    parseOpml :: ArrowXml cat => cat (NTree XNode) OPML
+    parseOpml :: ArrowXml cat => cat XmlTree OPML
     parseOpml = proc x -> do
-      outlines  <- getOutlines -< x
-      title     <- getTitle    -< x
-      returnA   -< OPML title outlines
-
-    getTitle :: ArrowXml cat => cat XmlTree String
-    getTitle = atElem "head" >>> atElem "title" >>> getChildren >>> getText
-
-    getOutlines :: ArrowXml cat => cat XmlTree [Outline]
-    getOutlines = atElem "body" >>> listA ( atElem "outline" >>> parseOutline )
+      t <- (atElem "head" >>> (      (atElem   "title" >>> parse        ))) -< x
+      o <- (atElem "body" >>> (listA (atElem "outline" >>> parseOutline ))) -< x
+      returnA   -< OPML t o
 
     parseOutline :: ArrowXml cat => cat XmlTree Outline
     parseOutline = proc x -> do
-      text      <- atAttr    "text" -< x
-      title     <- atAttr   "title" -< x
-      xmlUrl    <- atAttr  "xmlUrl" -< x
-      htmlUrl   <- atAttr "htmlUrl" -< x
-      returnA   -< Outline text title xmlUrl htmlUrl
+      te <- atAttr    "text" -< x
+      ti <- atAttr   "title" -< x
+      xu <- atAttr  "xmlUrl" -< x
+      hu <- atAttr "htmlUrl" -< x
+      returnA   -< Outline te ti xu hu
 
-    atElem :: ArrowXml cat => String -> cat (NTree XNode) XmlTree
-    atElem name = getChildren >>> isElem >>> hasName name
+    parse :: ArrowXml cat => cat XmlTree String
+    parse = getChildren >>> getText
 
     atAttr :: ArrowXml cat => String -> cat XmlTree String
     atAttr name = hasAttr name >>> getAttrValue name
+
+    atElem :: ArrowXml cat => String -> cat (NTree XNode) XmlTree
+    atElem name = getChildren >>> isElem >>> hasName name
